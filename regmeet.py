@@ -30,9 +30,12 @@ def notify(subject, body=''):
   msg['From'] = 'laufer@cs.luc.edu'
   msg['To'] = 'laufer@cs.luc.edu'
 
-  s = smtplib.SMTP('smtp.rcn.com')
-  s.sendmail(msg['From'], msg['To'], msg.as_string())
-  s.quit()
+  try:
+    s = smtplib.SMTP('smtp.rcn.com')
+    s.sendmail(msg['From'], msg['To'], msg.as_string())
+    s.quit()
+  except Exception:
+    print 'ERROR: cannot send email notification'
 
 # configuration settings 
 sleep_time = 120 # seconds
@@ -65,8 +68,11 @@ while True:
 
   # check for events on the desired date
   print now.strftime('%a %d %b %Y %H:%M'),
-  events = meetup.get_events(group_urlname=group_urlname, 
-             after=date_as_string, before=before_as_string)
+  try:
+    events = meetup.get_events(group_urlname=group_urlname, 
+                               after=date_as_string, before=before_as_string)
+  except Exception:
+    print 'WARNING: could not get event list, trying again'
   
   # try to sign up for any unseen events
   for event in events.results:
